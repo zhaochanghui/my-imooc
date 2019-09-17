@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.zch.dao.DepartmentDao">
+    <insert id="add" parameterType="com.zch.entity.Department">
+        insert into department(name,address) values (#{name},#{address})
+    </insert>
+    <delete id="delete" parameterType="Integer">
+        DELETE FROM department where id=#{value}
+    </delete>
+    <update id="update" parameterType="com.zch.entity.Department">
+        UPDATE department set name=#{name},address=#{address} where id=#{id}
+    </update>
+    <select id="find" parameterType="Integer" resultType="com.zch.entity.Department">
+        select * from department  where id=#{value}
+    </select>
+    <select id="findAll" resultType="com.zch.entity.Department">
+        select * from department
+    </select>
+</mapper>

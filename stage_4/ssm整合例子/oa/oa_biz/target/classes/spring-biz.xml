@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+	http://www.springframework.org/schema/beans/spring-beans.xsd
+	http://www.springframework.org/schema/aop
+	http://www.springframework.org/schema/aop/spring-aop.xsd
+	http://www.springframework.org/schema/tx
+	http://www.springframework.org/schema/tx/spring-tx.xsd
+	http://www.springframework.org/schema/context
+	http://www.springframework.org/schema/context/spring-context.xsd">
+
+    <import resource="spring-dao.xml" />
+    <!--自动扫描-->
+    <context:component-scan base-package="com.zch.oa.biz"/>
+
+    <!--自动代理-->
+    <aop:aspectj-autoproxy />
+
+    <!--事务管理器-->
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <!--配置数据源-->
+        <property name="dataSource" ref="dataSource" />
+    </bean>
+    <!---配置通知, transaction-manager的值是指定事务管理器，上一个bean的id-->
+    <tx:advice id="txAdvice" transaction-manager="transactionManager">
+        <!--以配置属性的方式。指定对哪些方法进行过滤,,read-only="true" 说白了就是只读，不用事务去封装;  propagation="REQUIRED" 是说强制开启一个事务-->
+        <tx:attributes>
+            <tx:method name="get*" read-only="true"/>
+            <tx:method name="find*" read-only="true"/>
+            <tx:method name="search*" read-only="true"/>
+            <tx:method name="*" propagation="REQUIRED" />
+        </tx:attributes>
+    </tx:advice>
+
+    <!--把通知和切入点关联起来-->
+    <aop:config>
+        <!--对com.zch.oa.biz包的所有类的所有方法，所有参数的方法进行过滤，过滤规则是id="txAdvice"-->
+        <aop:pointcut id="txpc" expression="execution(* com.zch.oa.biz.*.*(..))"/>
+        <aop:advisor advice-ref="txAdvice" pointcut-ref="txpc"/>
+    </aop:config>
+</beans>

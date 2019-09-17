@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.4//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.yys.dao.CategoryDao">
+    <resultMap id="category" type="com.yys.entity.Category">
+        <id property="id" column="id" javaType="Integer"/>
+        <result property="name" column="name" javaType="String"/>
+        <result property="pid" column="pid" javaType="Integer"/>
+    </resultMap>
+
+    <insert id="insert" parameterType="Category" useGeneratedKeys="true" keyColumn="id">
+        insert into category(name,pid)
+        value(#{name},#{pid})
+    </insert>
+    <delete id="delete" parameterType="Integer">
+        delete from category where id=#{id}
+    </delete>
+    <update id="update" parameterType="Category">
+        update category set name=#{name},pid=#{pid}
+        where id=#{id}
+    </update>
+    <select id="select" parameterType="Integer" resultMap="category">
+        select c.*,sub.id as parent_id,sub.name as parent_name from category as c
+        left join category as sub on sub.pid=c.id
+         where c.id=#{id}
+    </select>
+
+    <select id="getAll" resultMap="category">
+        select c.*,sub.id as parent_id,sub.name as parent_name from category as c
+        left join category as sub on c.pid=sub.id and sub.pid>0 where c.pid!=c.id
+    </select>
+</mapper>

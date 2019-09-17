@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://java.sun.com/xml/ns/javaee"
+         xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
+         version="3.0">
+
+<!-- 下面自定义的encoding 编码过滤器没起作用,目前靠characterEncodingFilter解决中文乱码 -->
+  <filter>
+    <filter-name>encoding</filter-name>
+    <filter-class>com.zch.oa.global.EncodingFilter</filter-class>
+    <init-param>
+      <param-name>encoding</param-name>
+      <param-value>utf-8</param-value>
+    </init-param>
+  </filter>
+
+  <filter-mapping>
+    <filter-name>encoding</filter-name>
+    <url-pattern>/</url-pattern>
+  </filter-mapping>
+
+  <filter>
+    <filter-name>characterEncodingFilter</filter-name>
+    <filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
+    <init-param>
+      <!--要使用的字符集，一般我们使用UTF-8(保险起见UTF-8最好)-->
+      <param-name>encoding</param-name>
+      <param-value>UTF-8</param-value>
+    </init-param>
+    <init-param>
+      <!--是否强制设置request的编码为encoding，默认false，不建议更改-->
+      <param-name>forceRequestEncoding</param-name>
+      <param-value>false</param-value>
+    </init-param>
+    <init-param>
+      <!--是否强制设置response的编码为encoding，建议设置为true，下面有关于这个参数的解释-->
+      <param-name>forceResponseEncoding</param-name>
+      <param-value>true</param-value>
+    </init-param>
+  </filter>
+  <filter-mapping>
+    <filter-name>characterEncodingFilter</filter-name>
+    <!--这里不能留空或者直接写 ' / ' ，否者不起作用-->
+    <url-pattern>/*</url-pattern>
+  </filter-mapping>
+
+
+  
+  <servlet-mapping>
+    <servlet-name>default</servlet-name>
+    <url-pattern>/assets/*</url-pattern>
+    <url-pattern>*.js</url-pattern>
+    <url-pattern>*.jpg</url-pattern>
+    <url-pattern>*.png</url-pattern>
+  </servlet-mapping>
+  <!--项目启动，只会读取web.xml-->
+  <servlet>
+    <servlet-name>springmvc</servlet-name>
+    <!--spring-web包提供-->
+    <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+    <!-- 可以自定义配置文件，也可以不配置下面的，直接全局配置-->
+    <init-param>
+      <param-name>contextConfigLocation</param-name>
+      <param-value>classpath:spring-web.xml</param-value>
+    </init-param>
+
+
+    <!--配置项目启动时自动加载-->
+    <load-on-startup>1</load-on-startup>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>springmvc</servlet-name>
+    <url-pattern>/</url-pattern>
+  </servlet-mapping>
+
+</web-app>

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+	http://www.springframework.org/schema/beans/spring-beans.xsd
+	http://www.springframework.org/schema/aop
+	http://www.springframework.org/schema/aop/spring-aop.xsd
+	http://www.springframework.org/schema/tx
+	http://www.springframework.org/schema/tx/spring-tx.xsd
+	http://www.springframework.org/schema/context
+	http://www.springframework.org/schema/context/spring-context.xsd">
+
+    <!--自动扫描 扫描持久化操作的dao-->
+    <context:component-scan base-package="com.zch.oa.dao" />
+    <!--配置数据源-->
+    <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+        <property name="driverClassName" value="com.mysql.cj.jdbc.Driver" />
+        <property name="url" value="jdbc:mysql://127.0.0.1:3306/oa?useUnicode=yes&amp;characterEncoding=UTF-8&amp;serverTimezone=UTC" />
+        <property name="username" value="root" />
+        <property name="password" value="root" />
+    </bean>
+
+    <!--配置session工厂，由mybatis-spring整合包提供-->
+    <bean id="sessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <!---至少配置一个属性：数据源—-->
+        <property name="dataSource" ref="dataSource" />
+        <!--其他配置，typeAliasesPackage,表示在配置文件中可以直接使用 value 实体包下的类名，不配置的话，则必须是实体包名.类名。比如配置insert语句，参数类型，直接写类名，不配就要写包名.类名-->
+        <property name="typeAliasesPackage" value="com.zch.oa.entity" />
+    </bean>
+
+    <!--映射器接口 ,因为是自动调用的，所以不需要指定ID,由mybatis-spring整合包里提供-->
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">  <!--至少配置2个属性,下面的第一个，第二个 -->
+        <!--  注意sqlSessionFactoryBeanName ，是value ,value的值是session工厂的ID,这里不是ref,因为sqlSessionFactoryBeanName 的返回值是字符串-->
+        <!--  注意sqlSessionFactoryBeanName ，是value ,value的值是session工厂的ID,这里不是ref,因为sqlSessionFactoryBeanName 的返回值是字符串-->
+        <property name="sqlSessionFactoryBeanName" value="sessionFactory"  />
+        <!--自动扫描dao里的接口，并且和配置文件关联起来，生成持久化对象，接口必须放在这个包下，映射文件也必须放置在这包下-->
+        <property name="basePackage" value="com.zch.oa.dao" />
+    </bean>
+</beans>

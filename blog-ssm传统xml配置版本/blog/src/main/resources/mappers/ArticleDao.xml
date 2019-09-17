@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.4//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.yys.dao.ArticleDao">
+    <resultMap id="article" type="Article">
+        <id property="id" column="id" javaType="Integer"/>
+        <result property="categoryId" column="category_id" javaType="Integer" />
+        <result property="title" column="title" javaType="String" />
+        <result property="brief" column="brief" javaType="String" />
+        <result property="content" column="content" javaType="String" />
+        <result property="createTime" column="create_time" javaType="java.util.Date" />
+        <result property="updateTime" column="update_time" javaType="java.util.Date" />
+        <association property="category" column="category_id" javaType="Category">
+            <!--只配置自己需要的字段 column不能上外面的重复-->
+            <id property="id" column="cid" javaType="Integer" />
+            <result property="name" column="cname" javaType="String" />
+        </association>
+    </resultMap>
+
+    <insert id="insert" parameterType="com.yys.entity.Article" useGeneratedKeys="true" keyColumn="id">
+        insert into article (title,category_id,brief,content,create_time,update_time)
+        values(#{title},#{categoryId},#{brief},#{content},#{createTime},#{updateTime})
+    </insert>
+    <delete id="delete" parameterType="Integer">
+        delete from article wher id=#{id}
+    </delete>
+
+    <insert id="update" parameterType="Article">
+         update article set title=#{title},category_id=#{categoryId},brief=#{brief},content=#{content},update_time=#{updateTime}
+        where id=#{id}
+    </insert>
+
+    <select id="select" parameterType="Integer" resultMap="article">
+         select a.* ,c.id as cid,c.name as cname  from article as a left join category  as c
+        on c.id=a.category_id where a.id=#{id}
+    </select>
+    <select id="getAll" resultMap="article">
+        select a.* ,c.id as cid,c.name as cname  from article as a left join category  as c
+        on c.id=a.category_id order by a.update_time desc
+    </select>
+
+    <select id="findBySearchAndCate" parameterType="Article" resultMap="article">
+        select a.* ,c.id as cid,c.name as cname  from article as a left join category  as c
+        on c.id=a.category_id
+        where 1=1
+        <if test="title!=null">
+            and a.title like '%${title}%'
+        </if>
+        <if test="cate!=null">
+            and a.category_id=#{cate}
+        </if>
+        order by a.update_time desc
+
+        <if test="limit!=null">
+            limit #{limit}
+        </if>
+    </select>
+</mapper>
